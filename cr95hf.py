@@ -11,19 +11,25 @@ class Cr95hf:
     self.CL2 = ""
 
   def wake(self):
+    """sends wake puls and waits"""
     self.ser.write(b"\x55")
     self.ser.read(1)
 
   def echo(self):
+    """sends echo end expects the same answer"""
     self.ser.write(b"\x55")
-    if (self.ser.read(1) != b"\x55"):
+    if (self.ser.read(1) == b"\x55"):
+      print('Echo OK')
+    else:
       print('echo error')
 
   def info(self):
+    """info about device"""
     self.ser.write(b"\x01\x00")
     print(f'IDN: {self.ser.read(17).hex()}')
 
   def protocol(self, type):
+    """selects card type protocol"""
     if (type == 'A'):
       self.ser.write(b"\x02\x02\x02\x00")
     elif(type == 'B'):
