@@ -1,5 +1,4 @@
 import serial as s
-import time as t
 
 class Cr95hf:
   """Class for controling cr95hf over serial line"""
@@ -29,7 +28,7 @@ class Cr95hf:
     print(f'IDN: {self.ser.read(17).hex()}')
 
   def protocol(self, type):
-    """selects card type protocol"""
+    """selects card type protocol ('A' for Type A, 'B' for Type B, 'N' for RF off)"""
     if (type == 'A'):
       self.ser.write(b"\x02\x02\x02\x00")
     elif(type == 'B'):
