@@ -5,9 +5,12 @@ class Cr95hf:
 
   def __init__(self):
     """Constructor of nfc object with default values"""
-    self.ser = s.Serial('/dev/ttyUSB0', 57600,timeout=1)
+    self.ser = s.Serial('/dev/ttyUSB1', 57600,timeout=1)
     self.CL1 = ""
     self.CL2 = ""
+
+  def __del__(self):
+    self.ser.close()
 
   def wake(self):
     """sends wake puls and waits"""
@@ -42,6 +45,24 @@ class Cr95hf:
       print(f'RF Type {type}')
     else:
       print('RF error')
+
+  def gain(self):
+    """set recomended gain for type 2 and type 4 tags"""
+    self.ser.write(b"\x09\x04\x68\x01\x01\xD3")
+    resp = self.ser.read(2)
+    if (resp.hex() == "0000"):
+      print(f'Gain set')
+    else:
+      print('Gain setting error')
+
+  def syncTime(self):
+    """set recomennded gain for type 2 and type 4 tags"""
+    self.ser.write(b"\x09\x04\x3A\x00\x58\x04")
+    resp = self.ser.read(2)
+    if (resp.hex() == "0000"):
+      print(f'Sync time optimized')
+    else:
+      print('Sync time optimization error')
 
   def reqA(self):
     """sends REQA and returns length of UID (-1 if none)"""

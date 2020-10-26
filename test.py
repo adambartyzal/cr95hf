@@ -7,6 +7,8 @@ nfc.wake()
 nfc.echo()
 nfc.info()
 nfc.protocol('A')
+#nfc.gain()
+#nfc.syncTime()
 uidLength = nfc.request('A')
 
 if (uidLength == 4):
@@ -23,3 +25,4 @@ nfc.protocol('N')
 nfc.protocol('B')
 nfc.request('B')
 nfc.protocol('N')
+del nfc
