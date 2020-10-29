@@ -1,11 +1,11 @@
 import serial as s
 
 class Cr95hf:
-  """Class for controling cr95hf over serial line"""
+  """Class for controling cr95hf over serial line."""
 
   def __init__(self):
-    """Constructor of nfc object with default values"""
-    self.ser = s.Serial('/dev/ttyUSB1', 57600,timeout=1)
+    """Constructor of nfc object with default values."""
+    self.ser = s.Serial('/dev/ttyUSB0', 57600,timeout=1)
     self.CL1 = ""
     self.CL2 = ""
 
@@ -13,12 +13,12 @@ class Cr95hf:
     self.ser.close()
 
   def wake(self):
-    """sends wake puls and waits"""
+    """Sends wake puls and waits."""
     self.ser.write(b"\x55")
     self.ser.read(1)
 
   def echo(self):
-    """sends echo end expects the same answer"""
+    """Sends echo end expects the same answer."""
     self.ser.write(b"\x55")
     if (self.ser.read(1) == b"\x55"):
       print('Echo OK')
@@ -26,12 +26,16 @@ class Cr95hf:
       print('echo error')
 
   def info(self):
-    """info about device"""
+    """Info about device."""
     self.ser.write(b"\x01\x00")
     print(f'IDN: {self.ser.read(17).hex()}')
 
   def protocol(self, type):
-    """selects card type protocol ('A' for Type A, 'B' for Type B, 'N' for RF off)"""
+    """
+    Selects card type protocol.
+      Parameter:
+        type (char): 'A' = Type A, 'B' = Type B, 'N' = RF off)
+    """
     if (type == 'A'):
       self.ser.write(b"\x02\x02\x02\x00")
     elif(type == 'B'):
@@ -46,9 +50,27 @@ class Cr95hf:
     else:
       print('RF error')
 
-  def gain(self):
-    """set recomended gain for type 2 and type 4 tags"""
-    self.ser.write(b"\x09\x04\x68\x01\x01\xD3")
+  def readArcB(self):
+    """Reads ARC_B register value."""
+    self.ser.write(b"\x09\x03\x68\x00\x01")
+    resp = self.ser.read(2)
+    if (resp.hex() == "0000"):
+      print(f'Gain set')
+    else:
+      print('Error')
+    self.ser.write(b"\x09\x03\x68\x00\x01")
+    resp = self.ser.read(2)
+    print(resp.hex())
+
+  def setArcB(self,index,gain):
+    """
+    Sets gain and modulation index.
+      Parameters:
+        index (char): 1 = 10%; 2 = 17%; 3 = 25%; 4 = 30%; 5 = 33%; 6 = 36%; D = 95% 
+        gain (char): 0 = 34dB; 1 = 32dB; 3 =  27dB; 7 = 20dB; F = 8dB 
+    """
+    arc_b = bytearray.fromhex(gain + index)
+    self.ser.write(b"\x09\x04\x68\x01\x01" + arc_b)
     resp = self.ser.read(2)
     if (resp.hex() == "0000"):
       print(f'Gain set')
@@ -56,7 +78,7 @@ class Cr95hf:
       print('Gain setting error')
 
   def syncTime(self):
-    """set recomennded gain for type 2 and type 4 tags"""
+    """Set recomennded gain for type 2 and type 4 tags."""
     self.ser.write(b"\x09\x04\x3A\x00\x58\x04")
     resp = self.ser.read(2)
     if (resp.hex() == "0000"):
@@ -64,26 +86,16 @@ class Cr95hf:
     else:
       print('Sync time optimization error')
 
-  def reqA(self):
-    """sends REQA and returns length of UID (-1 if none)"""
-    self.ser.write(b"\x04\x02\x26\x07")
-    resp = self.ser.read(7)
-    if (resp.hex() == "8700"):
-      print('No card')
-    elif (resp.hex() == "80050400280000"):
-      return 4
-    elif (resp.hex() == "80054403280000" or resp.hex() == "80054400280000"):
-      return 7
-    else:
-      return -1
-
   def request(self,type):
-    """sends REQ(type) and returns length of UID (-1 if none)"""
+    """
+    Sends REQ and returns length of UID (-1 if none).
+      Parameter:
+        type (char): 'A' = ISO/IEC 14443 Type A, 'B' = ISO/IEC 14443 Type B
+    """
     if (type == 'A'):
       self.ser.write(b"\x04\x02\x26\x07")
     elif(type == 'B'):
         self.ser.write(b"\x04\x03\x05\x00\x00")
-
     resp = self.ser.read(14)
     if (resp.hex() == "8700"):
       print('No card')
@@ -95,15 +107,14 @@ class Cr95hf:
       return -1
 
   def anticol1(self):
-    """cascade level 1 anticolision"""
+    """Cascade level 1 anticolision."""
     self.ser.write(b"\x04\x03\x93\x20\x08")
     self.CL1 = self.ser.read(10).hex().upper()
 
   def anticol2(self):
-    """cascade level 2 anticolision"""
+    """Cascade level 2 anticolision."""
     select1 = b'\x04\x08\x93\x70' + bytearray.fromhex(self.CL1[4:16])
     self.ser.write(select1)
     resp = self.ser.read(8)
     self.ser.write(b"\x04\x03\x95\x20\x08")
     self.CL2 = self.ser.read(10).hex().upper()
-

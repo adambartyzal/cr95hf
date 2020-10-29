@@ -7,7 +7,9 @@ nfc.wake()
 nfc.echo()
 nfc.info()
 nfc.protocol('A')
-#nfc.gain()
+nfc.readArcB()
+nfc.setArcB('D','3') # Recommended values: Type A = D3, Type B = 20
+nfc.readArcB()
 #nfc.syncTime()
 uidLength = nfc.request('A')
 
@@ -23,6 +25,10 @@ if (len(UID) != 0):
 nfc.protocol('N')
 
 nfc.protocol('B')
+nfc.readArcB()
+nfc.setArcB('2','0')
+nfc.readArcB()
+#nfc.syncTime()
 nfc.request('B')
 nfc.protocol('N')
 del nfc
