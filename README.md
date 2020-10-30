@@ -1,9 +1,8 @@
 # cr95hf
 Python class for testing cr95hd nfc modul
 # sources
-## datasheets
+## datasheet
 https://www.st.com/resource/en/datasheet/cr95hf.pdf  
-http://nfc-tools.org/index.php/ISO14443A  
 ## helpful articles and other datasheets
 ### cards summary
 https://xionghuilin.com/iso-iec-14443-type-ab-summary/  
