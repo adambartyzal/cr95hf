@@ -9,7 +9,7 @@ http://nfc-tools.org/index.php/ISO14443A
 https://xionghuilin.com/iso-iec-14443-type-ab-summary/  
 ### UID descriptions
 https://www.nxp.com/docs/en/application-note/AN10927.pdf  
-### REQB structure
-https://www.scstexas.com/index.php?option=com_content&view=article&id=134:smart-card-communications&catid=85:latest-news  
+### Commands described geniously in detail!!!
+http://sweet.ua.pt/andre.zuquete/Aulas/IRFID/11-12/docs/ISO-IEC_14443-3.pdf
 # calcs file
 Contains claculations for nfcm impedance matching
