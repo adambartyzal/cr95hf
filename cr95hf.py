@@ -99,7 +99,7 @@ class Cr95hf:
     if (type == 'A'):
       self.ser.write(b"\x04\x02\x26\x07")
     elif(type == 'B'):
-        self.ser.write(b"\x04\x03\x05\x00\x00")
+        self.ser.write(b"\x04\x03\x05\x00\x00") # AntiCol Prefix 05, AFI = \x00 means All Families respond, PARAM = \x00 means N = 1 therefore no waiting for slotmarker
     resp = self.ser.read(14)
     if (resp.hex() == "8700"):
       print('No card')
