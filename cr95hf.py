@@ -39,7 +39,7 @@ class Cr95hf:
     if (type == 'A'):
       self.ser.write(b"\x02\x02\x02\x00")
     elif(type == 'B'):
-      self.ser.write(b"\x02\x02\x03\x01") # B, 106 up, 106 down, CRC append
+      self.ser.write(b"\x02\x09\x03\x01\x00\x00\x00\xFF\x03\x00\xC8")
     elif(type == 'N'):
       self.ser.write(b"\x02\x02\x00\x00")
     else:
@@ -77,18 +77,14 @@ class Cr95hf:
     self.ser.write(arc_b)
     resp = self.ser.read(2)
     if (resp.hex() == "0000"):
-      print(f'Gain {index + gain} set')
+      print(f'Option {index + gain} set')
     else:
       print('Gain setting error')
 
-  def syncTime(self):
-    """Set recomennded gain for type 2 and type 4 tags."""
-    self.ser.write(b"\x09\x04\x3A\x00\x58\x04")
-    resp = self.ser.read(2)
-    if (resp.hex() == "0000"):
-      print(f'Sync time optimized')
-    else:
-      print('Sync time optimization error')
+  def apgen(self):
+    """Sends APGEN message sniffed from elatec reader."""
+    self.ser.write(b"\x04\x04\x00\x0B\x3F\x80")
+    print(self.ser.read(10).hex())
 
   def request(self,type):
     """
@@ -99,7 +95,7 @@ class Cr95hf:
     if (type == 'A'):
       self.ser.write(b"\x04\x02\x26\x07")
     elif(type == 'B'):
-        self.ser.write(b"\x04\x03\x05\x00\x00") # AntiCol Prefix 05, AFI = \x00 means All Families respond, PARAM = \x00 means N = 1 therefore no waiting for slotmarker
+      self.ser.write(b"\x04\x03\x05\x00\x00") # AntiCol Prefix 05, AFI = \x00 means All Families respond, PARAM = \x00 means N = 1 therefore no waiting for slotmarker
     resp = self.ser.read(14)
     if (resp.hex() == "8700"):
       print('No card')
@@ -113,7 +109,7 @@ class Cr95hf:
   def wakeupB(self):
     """Sends WUPB (same as REQB with wakeup bit up)."""
     self.ser.write(b"\x04\x03\x05\x00\x08")
-    resp = self.ser.read(14)
+    resp = self.ser.read(2)
     print(resp.hex())
 
   def anticol1(self):
